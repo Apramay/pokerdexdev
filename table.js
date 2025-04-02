@@ -15,7 +15,7 @@ async function createTable() {
     let maxBuyIn = gameType === "limit" ? bigBlind * 100 : null; // Max buy-in for limit game, no limit for "No Limit"
 
     try {
-const response = await fetch('https://pokerdexqa-server.onrender.com/registerTable', {  //  ✅  Full backend URL
+const response = await fetch('https://pokerdexdev-server.onrender.com/registerTable', {  //  ✅  Full backend URL
     method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -28,7 +28,7 @@ const response = await fetch('https://pokerdexqa-server.onrender.com/registerTab
         }
 
         // Table created successfully, generate the game URL
-        const tableUrl = `${window.location.origin}/pokerdexqa/game.html?table=${tableId}`;;
+        const tableUrl = `${window.location.origin}/pokerdexdev/game.html?table=${tableId}`;;
         document.getElementById('tableUrl').value = tableUrl;
         document.getElementById('tableLink').style.display = 'block';
     } catch (error) {
@@ -40,7 +40,7 @@ const response = await fetch('https://pokerdexqa-server.onrender.com/registerTab
 function joinTable() {
     const tableId = prompt("Enter the table ID:");
     if (tableId) {
-        window.location.href = `${window.location.origin}/pokerdexqa/game.html?table=${tableId}`;
+        window.location.href = `${window.location.origin}/pokerdexdev/game.html?table=${tableId}`;
     }
 }
 
@@ -58,7 +58,7 @@ function loadTableSettings() {
     const tableId = urlParams.get("table");
 
     if (tableId) {
-        fetch(`https://pokerdexqa-server.onrender.com/getTableSettings?tableId=${tableId}`)
+        fetch(`https://pokerdexdev-server.onrender.com/getTableSettings?tableId=${tableId}`)
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
