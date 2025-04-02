@@ -176,40 +176,69 @@ function updateActionHistory(actionText) {
     }
 }
 
-let mockWallet = {
-    publicKey: "MockPublicKey12345",
-    solBalance: 50,  // Mock SOL balance in dollars
-    tokenBalance: 0, // Mock in-game tokens
+let wallet = {
+    publicKey: null,
+    solBalance: 0,
+    tokenBalance: 0,
 };
 
-// Simulated Phantom Wallet Connection
-function connectMockWallet() {
-    console.log("🔗 Connecting to Mock Phantom Wallet...");
+// Function to connect to Phantom Wallet
+async function connectPhantomWallet() {
+    if (window.solana && window.solana.isPhantom) {
+        try {
+            const response = await window.solana.connect();
+            wallet.publicKey = response.publicKey.toString();
+            console.log("✅ Connected to Phantom Wallet:", wallet.publicKey);
 
-    // Simulate a wallet connection popup
-    setTimeout(() => {
-        alert("🔗 Mock Phantom Wallet Connected!");
-        sessionStorage.setItem("playerWallet", mockWallet.publicKey);
-        sessionStorage.setItem("walletSolBalance", mockWallet.solBalance);
-        sessionStorage.setItem("walletTokenBalance", mockWallet.tokenBalance);
-
-        updateMockWalletUI();
-        console.log("✅ Connected to Mock Phantom Wallet:", mockWallet.publicKey);
-    }, 1000); // Simulate delay to feel like a real wallet connection
+            // Fetch SOL balance
+            await getWalletBalance();
+        } catch (err) {
+            console.error("❌ Wallet connection failed:", err);
+        }
+    } else {
+        alert("Phantom Wallet not found! Please install it.");
+    }
 }
+
+// Function to fetch the SOL balance of the wallet
+async function getWalletBalance() {
+    if (!wallet.publicKey) return;
+
+    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"));
+    const balance = await connection.getBalance(new solanaWeb3.PublicKey(wallet.publicKey));
+    wallet.solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
+    
+    console.log(`💰 Wallet Balance: ${wallet.solBalance} SOL`);
+    document.getElementById("wallet-balance").textContent = `${wallet.solBalance} SOL`;
+}
+
+// Event listener for connecting wallet
+document.getElementById("connect-wallet-btn").addEventListener("click", connectPhantomWallet);
+
+async function getTokenBalance(mintAddress) {
+    if (!wallet.publicKey) return;
+
+    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"));
+    const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+        new solanaWeb3.PublicKey(wallet.publicKey),
+        { mint: new solanaWeb3.PublicKey(mintAddress) }
+    );
+
+    if (tokenAccounts.value.length > 0) {
+        wallet.tokenBalance = tokenAccounts.value[0].account.data.parsed.info.tokenAmount.uiAmount;
+    } else {
+        wallet.tokenBalance = 0;
+    }
+    console.log(`🎲 Token Balance: ${wallet.tokenBalance}`);
+    document.getElementById("wallet-token-balance").textContent = `${wallet.tokenBalance} Tokens`;
+}
+
 
 // Function to update UI display of mock wallet balances
-function updateMockWalletUI() {
-    document.getElementById("wallet-balance").innerText = `Mock SOL Balance: ${mockWallet.solBalance} SOL`;
-    document.getElementById("token-balance").innerText = `Mock Tokens: ${mockWallet.tokenBalance}`;
+function updateWalletUI() {
+    document.getElementById("wallet-balance").innerText = ` SOL Balance: ${Wallet.solBalance} SOL`;
+    document.getElementById("token-balance").innerText = ` Tokens: ${Wallet.tokenBalance}`;
 }
-
-// Automatically connect the mock wallet when the page loads
-document.addEventListener("DOMContentLoaded", function () {
-
-    connectMockWallet();
-});
-
 
 document.addEventListener("DOMContentLoaded", function () {
     const socket = new WebSocket("wss://pokerdexdev-server.onrender.com"); // Replace with your server address
@@ -245,7 +274,7 @@ const maxBuyIn = gameSettings.gameType === "limit"
             return;
         }
 
-        if (selectedSol > mockWallet.solBalance) {
+        if (selectedSol > wallet.solBalance) {
             alert("❌ Not enough mock SOL in wallet!");
             return;
         }
@@ -255,8 +284,8 @@ const tokenAmount = selectedSol * gameSettings.solToToken;
         
 
         // Deduct SOL from mock wallet & add tokens
-        mockWallet.solBalance -= selectedSol;
-        mockWallet.tokenBalance += tokenAmount;
+        wallet.solBalance -= selectedSol;
+        wallet.tokenBalance += tokenAmount;
          if (tokenAmount < minBuyIn) {
         alert(`❌ Minimum buy-in is ${minBuyIn} tokens (10x Big Blind)`);
         return;
@@ -278,8 +307,8 @@ const tokenAmount = selectedSol * gameSettings.solToToken;
         console.log(`✅ ${playerName} converted ${selectedSol} SOL → ${tokenAmount} tokens and joined.`);
 
         // Update UI balances
-        document.getElementById("wallet-balance").innerText = `Mock SOL Balance: ${mockWallet.solBalance}`;
-        document.getElementById("token-balance").innerText = `Mock Tokens: ${mockWallet.tokenBalance}`;
+        document.getElementById("wallet-balance").innerText = `Mock SOL Balance: ${wallet.solBalance}`;
+        document.getElementById("token-balance").innerText = `Mock Tokens: ${wallet.tokenBalance}`;
 
         // Clear input fields
         playerNameInput.value = "";
@@ -332,11 +361,11 @@ document.getElementById("cashout-btn").addEventListener("click", () => {
     if (!confirmCashout) return;  // Cancel if user declines
 
     // 🔹 Ensure we properly refund the exact SOL amount
-    mockWallet.tokenBalance = 0;
-    mockWallet.solBalance = parseFloat(mockWallet.solBalance + solAmount - fee).toFixed(6);  
+    wallet.tokenBalance = 0;
+    wallet.solBalance = parseFloat(wallet.solBalance + solAmount - fee).toFixed(6);  
 
     console.log(`✅ Cashed out ${tokensToCashOut} tokens → ${(solAmount - fee).toFixed(6)} SOL (1% fee: ${fee.toFixed(6)} SOL).`);
-    document.getElementById("wallet-balance").innerText = `Mock SOL Balance: ${mockWallet.solBalance} SOL`;
+    document.getElementById("wallet-balance").innerText = `Mock SOL Balance: ${wallet.solBalance} SOL`;
     document.getElementById("token-balance").innerText = `Mock Tokens: 0`;
 
     // 🔹 Notify server about cash-out and player removal
@@ -385,11 +414,11 @@ document.getElementById("cashout-btn").addEventListener("click", () => {
             playerSolBalance: playerSolBalance //  ✅  Send SOL balance
         }));
 //  ✅  Update client-side mock wallet
-        mockWallet.solBalance -= solToAdd;
-        mockWallet.tokenBalance += tokensToAdd;
-        sessionStorage.setItem("walletSolBalance", mockWallet.solBalance.toString());
-        sessionStorage.setItem("walletTokenBalance", mockWallet.tokenBalance.toString());
-        updateMockWalletUI();  //  ✅  Update the UI
+        wallet.solBalance -= solToAdd;
+        wallet.tokenBalance += tokensToAdd;
+        sessionStorage.setItem("walletSolBalance", wallet.solBalance.toString());
+        sessionStorage.setItem("walletTokenBalance", wallet.tokenBalance.toString());
+        updatewalletUI();  //  ✅  Update the UI
 
         addTokensInput.value = ""; // Clear the input
     });
