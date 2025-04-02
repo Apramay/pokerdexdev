@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Pokerdex</title>
+    <title>pokerdev</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Pokerdex</h1>
+    <h1>pokerdev</h1>
 <div id="game-info-panel">
     <div id="table-info">
         <p>Small Blind: <span id="small-blind-display">__</span></p>
@@ -82,7 +82,7 @@
             // Fetch table settings from the server
             async function loadTableSettings() {
                 try {
-const response = await fetch(`https://pokerdexqa-server.onrender.com/getTableSettings?tableId=${tableId}`);
+const response = await fetch(`https://pokerdexdev-server.onrender.com/getTableSettings?tableId=${tableId}`);
                     if (!response.ok) {
                         throw new Error('Failed to load table settings');
                     }
