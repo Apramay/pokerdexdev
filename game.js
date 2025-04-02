@@ -17,7 +17,7 @@ let gameSettings = { // Initialize gameSettings
 
 async function loadGameSettings() {
     try {
-        const response = await fetch(`https://pokerdexqa-server.onrender.com/getTableSettings?tableId=${tableId}`);
+        const response = await fetch(`https://pokerdexdev-server.onrender.com/getTableSettings?tableId=${tableId}`);
         if (!response.ok) {
             throw new Error('Failed to load table settings');
         }
@@ -87,7 +87,7 @@ function displayCard(card) {
     const suit = card.suit.toLowerCase();
     const imageName = `${rank}_of_${suit}.png`;
 
-    return `<img src="https://apramay.github.io/pokerdexqa/cards/${imageName}" 
+    return `<img src="https://apramay.github.io/pokerdexdev/cards/${imageName}" 
             alt="${rank} of ${suit}" 
             onerror="this.onerror=null; this.src='./cards/default.png';">`;
 }
@@ -133,7 +133,7 @@ function updateUI(tableId) {
         if (index === (gameState.dealerIndex + 2) % gameState.players.length && player.tokens > 0) blindIndicator = "BB ";
             let displayedHand = player.name === gameState.players[gameState.currentPlayerIndex].name
         ? displayHand(player.hand)
-            : `<div class="card"><img src="https://apramay.github.io/pokerdexqa/cards/back.jpg" 
+            : `<div class="card"><img src="https://apramay.github.io/pokerdexdev/cards/back.jpg" 
     alt="Card Back" style="width: 100px; height: auto;"></div>`;
         playerDiv.innerHTML = `
          
@@ -212,7 +212,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 document.addEventListener("DOMContentLoaded", function () {
-    const socket = new WebSocket("wss://pokerdexqa-server.onrender.com"); // Replace with your server address
+    const socket = new WebSocket("wss://pokerdexdev-server.onrender.com"); // Replace with your server address
     socket.onopen = () => {
         console.log(" ✅  Connected to WebSocket server");
     };
