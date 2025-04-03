@@ -190,6 +190,7 @@ async function connectPhantomWallet() {
             const response = await window.solana.connect();
             wallet.publicKey = response.publicKey.toString();
             console.log("✅ Connected to Phantom Wallet:", wallet.publicKey);
+            document.getElementById("wallet-address").textContent = wallet.publicKey;
 
             // Fetch SOL balance
             await getWalletBalance();
