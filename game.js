@@ -342,7 +342,13 @@ if (tokenEl) {
         // Clear input fields
         playerNameInput.value = "";
         solAmountInput.value = "";
+        } catch (err) {
+    console.error("❌ Transaction failed:", err);
+    alert("❌ SOL transfer failed. Confirm wallet, balance, and approval in Phantom.");
+}
+
     };
+        
 } else {
     console.error(" ❌  Player input elements not found!");
 }
