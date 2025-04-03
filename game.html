@@ -3,12 +3,16 @@
 <head>
     <title>pokerdex</title>
     <link rel="stylesheet" href="style.css">
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/buffer/6.0.3/index.min.js"></script>
-  <script>
-    window.Buffer = buffer.Buffer;
-          globalThis.Buffer = buffer.Buffer;
+     <script>
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/buffer/6.0.3/index.min.js";
+    script.onload = () => {
+      window.Buffer = buffer.Buffer;
+      globalThis.Buffer = buffer.Buffer;
+      console.log("✅ Buffer polyfill loaded");
+    };
+    document.head.appendChild(script);
   </script>
-
 
 </head>
 <body>
