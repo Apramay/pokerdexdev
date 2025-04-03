@@ -3,6 +3,25 @@
 <head>
     <title>pokerdex</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+        // Create buffer namespace if it doesn't exist
+        window.buffer = window.buffer || {};
+        // Create global reference needed by some libraries
+        window.global = window.global || window;
+    </script>
+    
+    <!-- 2. Load the Buffer implementation -->
+    <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/dist/buffer.min.js"></script>
+    
+    <!-- 3. Initialize Buffer properly -->
+    <script>
+        // Make Buffer available globally
+        window.Buffer = window.buffer.Buffer;
+        
+        // Verify initialization
+        console.log("Buffer test:", typeof Buffer); // Should be "function"
+        console.log("Buffer test:", Buffer.from("test").toString()); // Should work
+    </script>
     
 </head>
 <body>
@@ -71,19 +90,7 @@
     <button id="add-tokens-btn">Add Tokens</button>
 </div>            
     </div>
-<script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/dist/buffer.min.js"></script>
-    
-    <!-- 2. Then initialize global variables -->
-    <script>
-        // Initialize global variables needed by Solana
-        window.global = window;
-        if (typeof window.Buffer === 'undefined') {
-            window.Buffer = buffer.Buffer;
-        }
-        
-        // Test if Buffer works
-        console.log("Buffer test:", new Buffer.from("hello").toString());
-    </script>
+
         <script src="https://unpkg.com/@solana/web3.js@1.73.2/lib/index.iife.js"></script>
 
     
