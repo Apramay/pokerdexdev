@@ -310,8 +310,14 @@ const tokenAmount = selectedSol * gameSettings.solToToken;
         console.log(`✅ ${playerName} converted ${selectedSol} SOL → ${tokenAmount} tokens and joined.`);
 
         // Update UI balances
-        document.getElementById("wallet-balance").innerText = `Mock SOL Balance: ${wallet.solBalance}`;
-        document.getElementById("token-balance").innerText = `Mock Tokens: ${wallet.tokenBalance}`;
+const balanceEl = document.getElementById("wallet-balance");
+if (balanceEl) {
+    balanceEl.innerText = `SOL Balance: ${wallet.solBalance}`;
+}
+const tokenEl = document.getElementById("token-balance");
+if (tokenEl) {
+    tokenEl.innerText = `Tokens: ${wallet.tokenBalance}`;
+}
 
         // Clear input fields
         playerNameInput.value = "";
