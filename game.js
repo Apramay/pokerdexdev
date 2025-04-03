@@ -254,7 +254,7 @@ const playerNameInput = document.getElementById("player-name-input");
 const solAmountInput = document.getElementById("sol-amount-input"); // Use SOL input instead of token input
 
 if (addPlayerBtn && playerNameInput && solAmountInput) {
-    addPlayerBtn.onclick = function () {
+    addPlayerBtn.onclick = async function () {
         const playerName = playerNameInput.value.trim();
         const selectedSol = parseFloat(solAmountInput.value); // Player chooses SOL amount
             const minBuyIn = gameSettings.bigBlind * 10;  // 10x Big Blind
