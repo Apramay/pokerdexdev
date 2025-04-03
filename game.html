@@ -71,12 +71,19 @@
     <button id="add-tokens-btn">Add Tokens</button>
 </div>            
     </div>
-<script>
-  // Initialize Buffer polyfill
-  window.global = window;
-  window.Buffer = window.Buffer || require('buffer').Buffer;
-</script>
 <script src="https://cdn.jsdelivr.net/npm/buffer@6.0.3/dist/buffer.min.js"></script>
+    
+    <!-- 2. Then initialize global variables -->
+    <script>
+        // Initialize global variables needed by Solana
+        window.global = window;
+        if (typeof window.Buffer === 'undefined') {
+            window.Buffer = buffer.Buffer;
+        }
+        
+        // Test if Buffer works
+        console.log("Buffer test:", new Buffer.from("hello").toString());
+    </script>
         <script src="https://unpkg.com/@solana/web3.js@1.73.2/lib/index.iife.js"></script>
 
     
