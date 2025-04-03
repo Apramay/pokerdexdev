@@ -2,6 +2,7 @@ const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
 const ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 const rankValues = { "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14 };
 
+
 // Function to get URL parameters
 function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -208,6 +209,7 @@ async function getWalletBalance() {
 
     const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=23d44740-e316-4d75-99b0-7fc95050f696");
     const balance = await connection.getBalance(new solanaWeb3.PublicKey(wallet.publicKey));
+    const POKERDEX_TREASURY = "4t1re84Q3VyJgHocJ7dPV3Z66RD883fGsM4Pzbwmc7utP1j1zt1hCQmtmQ6Fc4DCQc7MgkLNTMegEXSgjvtj5a3L"; // 🔁 REPLACE with your Backpack wallet pubkey
     wallet.solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
     
     console.log(`💰 Wallet Balance: ${wallet.solBalance} SOL`);
@@ -265,21 +267,34 @@ const maxBuyIn = gameSettings.gameType === "limit"
         const tableId = urlParams.get('table');
         console.log("✅ Extracted tableId:", tableId);
 
-        // ⚠️ Validate inputs
-        if (!playerName) {
-            alert("⚠️ Please enter a valid player name!");
-            return;
-        }
+       if (!wallet || !wallet.publicKey) {
+        alert("❌ Connect your wallet first.");
+        return;
+    }
 
-        if (!selectedSol || selectedSol <= 0) {
-            alert("⚠️ Please enter a valid SOL amount!");
-            return;
-        }
+    if (!playerName || isNaN(selectedSol) || selectedSol <= 0) {
+        alert("❌ Enter a valid name and SOL amount.");
+        return;
+    }
 
-        if (selectedSol > wallet.solBalance) {
-            alert("❌ Not enough mock SOL in wallet!");
-            return;
-        }
+    const lamports = selectedSol * 1e9;
+
+    try {
+        // ✅ 1. Create transfer transaction: Player → Treasury
+        const transaction = new solanaWeb3.Transaction().add(
+            solanaWeb3.SystemProgram.transfer({
+                fromPubkey: wallet.publicKey,
+                toPubkey: new solanaWeb3.PublicKey(POKERDEX_TREASURY),
+                lamports,
+            })
+        );
+
+        // ✅ 2. Send transaction via Phantom
+        const { signature } = await window.solana.signAndSendTransaction(transaction);
+        await connection.confirmTransaction(signature, "confirmed");
+
+        console.log("✅ SOL sent to treasury. Tx Signature:", signature);
+
 
         // Convert SOL to Tokens (100 Tokens per $1)
 const tokenAmount = selectedSol * gameSettings.solToToken;
@@ -299,14 +314,19 @@ const tokenAmount = selectedSol * gameSettings.solToToken;
 
         // ✅ Send player name, tableId, and tokens to WebSocket server
         socket.send(JSON.stringify({ 
-            type: "join", 
-            name: playerName, 
-            tokens: tokenAmount,  
-                walletAddress: wallet.publicKey,  // 🆕 add this
-            tableId: tableId 
+            type: "join",
+            name: playerName,
+            walletAddress: wallet.publicKey.toString(),
+            tableId: tableId,
+            tokens: tokenAmount,
+            solUsed: selectedSol,                    // 💡 Important for backend safety
+            solToToken: gameSettings.solToToken   
         }));
 
         sessionStorage.setItem("playerName", playerName);
+        wallet.tokenBalance = tokenAmount;
+        wallet.solBalance = (parseFloat(wallet.solBalance) - selectedSol).toFixed(6);
+
         console.log(`✅ ${playerName} converted ${selectedSol} SOL → ${tokenAmount} tokens and joined.`);
 
         // Update UI balances
