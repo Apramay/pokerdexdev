@@ -108,9 +108,9 @@ const response = await fetch(`https://pokerdexdev-server.onrender.com/getTableSe
 <script src="https://unpkg.com/@solana/web3.js@1.73.2/lib/index.iife.js"></script>
         <!-- ✅ Load a proper UMD version of Buffer -->
 <!-- Load Buffer (UMD version that defines global 'buffer') -->
-<script src="https://unpkg.com/buffer@6.0.3/index.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/buffer/5.7.1/buffer.min.js"></script>
 <script>
-  window.Buffer = buffer.Buffer;
+  window.Buffer = window.buffer.Buffer;
 </script>
 <script src="game.js"></script>
 </body>
