@@ -403,6 +403,7 @@ let conversionRate = gameSettings.solToToken;
 
     // 🔹 Ensure we properly refund the exact SOL amount
     wallet.tokenBalance = 0;
+    player.tokens = 0;  // ✅ Fix: Update game state correctly
     wallet.solBalance = parseFloat(wallet.solBalance + solAmount - fee).toFixed(6);  
 
     console.log(`✅ Cashed out ${tokensToCashOut} tokens → ${(solAmount - fee).toFixed(6)} SOL (1% fee: ${fee.toFixed(6)} SOL).`);
