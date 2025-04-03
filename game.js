@@ -205,7 +205,7 @@ async function connectPhantomWallet() {
 async function getWalletBalance() {
     if (!wallet.publicKey) return;
 
-    const connection = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl("mainnet-beta"));
+    const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=23d44740-e316-4d75-99b0-7fc95050f696");
     const balance = await connection.getBalance(new solanaWeb3.PublicKey(wallet.publicKey));
     wallet.solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
     
