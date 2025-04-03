@@ -450,7 +450,7 @@ let conversionRate = gameSettings.solToToken;
         wallet.tokenBalance += tokensToAdd;
         sessionStorage.setItem("walletSolBalance", wallet.solBalance.toString());
         sessionStorage.setItem("walletTokenBalance", wallet.tokenBalance.toString());
-        updatewalletUI();  //  ✅  Update the UI
+        updateWalletUI();  //  ✅  Update the UI
 
         addTokensInput.value = ""; // Clear the input
     });
