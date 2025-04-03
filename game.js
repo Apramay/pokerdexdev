@@ -469,7 +469,7 @@ let conversionRate = gameSettings.solToToken;
         })
     );
 
-    const { blockhash } = await connection.getLatestBlockhash();
+    const { blockhash } =  connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = wallet.publicKey;
 
