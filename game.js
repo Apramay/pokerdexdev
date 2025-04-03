@@ -374,8 +374,11 @@ document.getElementById("cashout-btn").addEventListener("click", () => {
     wallet.solBalance = parseFloat(wallet.solBalance + solAmount - fee).toFixed(6);  
 
     console.log(`✅ Cashed out ${tokensToCashOut} tokens → ${(solAmount - fee).toFixed(6)} SOL (1% fee: ${fee.toFixed(6)} SOL).`);
-    document.getElementById("wallet-balance").innerText = `Mock SOL Balance: ${wallet.solBalance} SOL`;
-    document.getElementById("token-balance").innerText = `Mock Tokens: 0`;
+    const walletEl = document.getElementById("wallet-balance");
+    if (walletEl) walletEl.innerText = `SOL Balance: ${wallet.solBalance} SOL`;
+
+    const tokenEl = document.getElementById("token-balance");
+    if (tokenEl) tokenEl.innerText = `Tokens: 0`;
 
     // 🔹 Notify server about cash-out and player removal
     socket.send(JSON.stringify({
