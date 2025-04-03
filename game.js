@@ -351,7 +351,7 @@ document.getElementById("cashout-btn").addEventListener("click", () => {
     }
 
     // 🔹 Corrected SOL conversion (100 tokens = 1 SOL)
-    let conversionRate = 100;  
+let conversionRate = gameSettings.solToToken;
     let solAmount = tokensToCashOut / conversionRate; 
 
 
