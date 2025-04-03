@@ -193,7 +193,7 @@ async function connectPhantomWallet() {
     if (window.solana && window.solana.isPhantom) {
         try {
             const response = await window.solana.connect();
-            wallet.publicKey = response.publicKey.toString();
+            wallet.publicKey = response.publicKey;
             console.log("✅ Connected to Phantom Wallet:", wallet.publicKey);
             document.getElementById("wallet-address").textContent = wallet.publicKey;
 
