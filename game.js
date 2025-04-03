@@ -288,9 +288,12 @@ const maxBuyIn = gameSettings.gameType === "limit"
             solanaWeb3.SystemProgram.transfer({
                 fromPubkey: wallet.publicKey,
                 toPubkey: new solanaWeb3.PublicKey(POKERDEX_TREASURY),
-                lamports,
+                lamports: selectedSol * solanaWeb3.LAMPORTS_PER_SOL,
             })
         );
+const { blockhash } = await connection.getLatestBlockhash();
+transaction.recentBlockhash = blockhash;
+transaction.feePayer = wallet.publicKey;
 
         // ✅ 2. Send transaction via Phantom
         const { signature } = await window.solana.signAndSendTransaction(transaction);
