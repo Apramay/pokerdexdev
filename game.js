@@ -459,13 +459,46 @@ let conversionRate = gameSettings.solToToken;
             playerSolBalance: playerSolBalance //  ✅  Send SOL balance
         }));
 //  ✅  Update client-side mock wallet
-        wallet.solBalance -= solToAdd;
-        wallet.tokenBalance += tokensToAdd;
-        sessionStorage.setItem("walletSolBalance", wallet.solBalance.toString());
-        sessionStorage.setItem("walletTokenBalance", wallet.tokenBalance.toString());
-        updateWalletUI();  //  ✅  Update the UI
+        try {
+    // Transfer SOL to treasury
+    const transaction = new solanaWeb3.Transaction().add(
+        solanaWeb3.SystemProgram.transfer({
+            fromPubkey: wallet.publicKey,
+            toPubkey: new solanaWeb3.PublicKey(POKERDEX_TREASURY),
+            lamports: solToAdd * 1e9,
+        })
+    );
 
-        addTokensInput.value = ""; // Clear the input
+    const { blockhash } = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = wallet.publicKey;
+
+    const { signature } = await window.solana.signAndSendTransaction(transaction);
+    await connection.confirmTransaction(signature, "confirmed");
+
+    console.log("✅ SOL sent to treasury. Notifying backend...");
+
+    socket.send(JSON.stringify({
+        type: "addTokens",
+        playerName,
+        tableId,
+        tokens: tokensToAdd,
+        solUsed: solToAdd
+    }));
+
+    // ✅ Update local wallet + UI
+    wallet.solBalance -= solToAdd;
+    wallet.tokenBalance += tokensToAdd;
+    sessionStorage.setItem("walletSolBalance", wallet.solBalance.toString());
+    sessionStorage.setItem("walletTokenBalance", wallet.tokenBalance.toString());
+    updateWalletUI();
+    addTokensInput.value = "";
+
+} catch (err) {
+    console.error("❌ Token addition failed:", err);
+    alert("❌ Failed to send SOL. Please approve transaction in Phantom.");
+}
+
     });
 }  else {
     console.error("❌ Add Tokens input or button not found!");
