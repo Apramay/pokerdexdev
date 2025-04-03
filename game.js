@@ -469,12 +469,12 @@ let conversionRate = gameSettings.solToToken;
         })
     );
 
-    const { blockhash } =  connection.getLatestBlockhash();
+    const { blockhash } = connection.getLatestBlockhash();
     transaction.recentBlockhash = blockhash;
     transaction.feePayer = wallet.publicKey;
 
-    const { signature } = await window.solana.signAndSendTransaction(transaction);
-    await connection.confirmTransaction(signature, "confirmed");
+    const { signature } =  window.solana.signAndSendTransaction(transaction);
+     connection.confirmTransaction(signature, "confirmed");
 
     console.log("✅ SOL sent to treasury. Notifying backend...");
 
