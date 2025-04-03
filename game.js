@@ -302,6 +302,7 @@ const tokenAmount = selectedSol * gameSettings.solToToken;
             type: "join", 
             name: playerName, 
             tokens: tokenAmount,  
+                walletAddress: wallet.publicKey,  // 🆕 add this
             tableId: tableId 
         }));
 
