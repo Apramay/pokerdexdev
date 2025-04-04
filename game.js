@@ -1,42 +1,3 @@
-
-// ✅ Secure backend buy-in transaction
-async function buyIn(amountSol) {
-  try {
-    if (!window.solana || !window.solana.isPhantom) {
-      alert("Phantom Wallet not found!");
-      return;
-    }
-
-    const resp = await window.solana.connect();
-    const publicKey = resp.publicKey.toString();
-
-    const res = await fetch("https://your-backend-url.com/api/buyin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ from: publicKey, amount: amountSol })
-    });
-
-    const data = await res.json();
-
-    if (!data.transaction) {
-      console.error("No transaction received:", data);
-      return;
-    }
-
-    const recoveredTx = solanaWeb3.Transaction.from(
-      Buffer.from(data.transaction, "base64")
-    );
-
-    const signed = await window.solana.signAndSendTransaction(recoveredTx);
-    await window.solana.connection.confirmTransaction(signed.signature, "confirmed");
-    console.log("✅ Buy-in transaction confirmed:", signed.signature);
-  } catch (err) {
-    console.error("❌ Buy-in failed:", err);
-    alert("Buy-in failed");
-  }
-}
-
-
 const suits = ["Hearts", "Diamonds", "Clubs", "Spades"];
 const ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
 const rankValues = { "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, "J": 11, "Q": 12, "K": 13, "A": 14 };
@@ -151,6 +112,7 @@ const addTokensBtn = document.getElementById("add-tokens-btn");
 //  ✅  Table-specific game states
 const gameStates = new Map();
 let currentTableId = null;
+    const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=23d44740-e316-4d75-99b0-7fc95050f696");
 
 const POKERDEX_TREASURY = "Ev3qxX4nZEr3erbMCte6Ji1sBR26SbWYEKUxMm3Mdxxg";
 
@@ -245,51 +207,11 @@ async function connectPhantomWallet() {
     }
 }
 
-async function buyIn(amountSol) {
-  try {
-    if (!window.solana || !window.solana.isPhantom) {
-      alert("Phantom Wallet not found!");
-      return;
-    }
-
-    // Connect wallet if not already connected
-    const resp = await window.solana.connect();
-    const publicKey = resp.publicKey.toString();
-
-    // 1. Call backend to generate a transaction
-    const res = await fetch("https://pokerdexdev-server.onrender.com/api/buyin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ from: publicKey, amount: amountSol })
-    });
-
-    const data = await res.json();
-
-    if (!data.transaction) {
-      console.error("No transaction received:", data);
-      return;
-    }
-
-    // 2. Decode transaction from base64
-    const recoveredTx = solanaWeb3.Transaction.from(
-      Buffer.from(data.transaction, "base64")
-    );
-
-    // 3. Sign and send using Phantom
-    const signed = await window.solana.signAndSendTransaction(recoveredTx);
-    console.log("✅ Transaction sent! Signature:", signed.signature);
-    alert(`Buy-in successful!\nTx: ${signed.signature}`);
-  } catch (err) {
-    console.error("❌ Buy-in failed:", err);
-    alert("Buy-in failed");
-  }
-}
-
-
 // Function to fetch the SOL balance of the wallet
 async function getWalletBalance() {
     if (!wallet.publicKey) return;
 
+    const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=23d44740-e316-4d75-99b0-7fc95050f696");
     const balance = await connection.getBalance(new solanaWeb3.PublicKey(wallet.publicKey));
     wallet.solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
     
