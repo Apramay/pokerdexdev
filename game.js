@@ -207,6 +207,47 @@ async function connectPhantomWallet() {
     }
 }
 
+async function buyIn(amountSol) {
+  try {
+    if (!window.solana || !window.solana.isPhantom) {
+      alert("Phantom Wallet not found!");
+      return;
+    }
+
+    // Connect wallet if not already connected
+    const resp = await window.solana.connect();
+    const publicKey = resp.publicKey.toString();
+
+    // 1. Call backend to generate a transaction
+    const res = await fetch("https://pokerdexdev-server.onrender.com/api/buyin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ from: publicKey, amount: amountSol })
+    });
+
+    const data = await res.json();
+
+    if (!data.transaction) {
+      console.error("No transaction received:", data);
+      return;
+    }
+
+    // 2. Decode transaction from base64
+    const recoveredTx = solanaWeb3.Transaction.from(
+      Buffer.from(data.transaction, "base64")
+    );
+
+    // 3. Sign and send using Phantom
+    const signed = await window.solana.signAndSendTransaction(recoveredTx);
+    console.log("✅ Transaction sent! Signature:", signed.signature);
+    alert(`Buy-in successful!\nTx: ${signed.signature}`);
+  } catch (err) {
+    console.error("❌ Buy-in failed:", err);
+    alert("Buy-in failed");
+  }
+}
+
+
 // Function to fetch the SOL balance of the wallet
 async function getWalletBalance() {
     if (!wallet.publicKey) return;
