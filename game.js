@@ -114,7 +114,7 @@ const gameStates = new Map();
 let currentTableId = null;
     const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=23d44740-e316-4d75-99b0-7fc95050f696");
 
-const POKERDEX_TREASURY = "2yTVMDxS1zCh9w1LD58U8UL5m96ZNXsTMY97e4stRJHQ";
+const POKERDEX_TREASURY = "Ev3qxX4nZEr3erbMCte6Ji1sBR26SbWYEKUxMm3Mdxxg";
 
 
 function updateUI(tableId) {
