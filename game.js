@@ -112,7 +112,7 @@ const addTokensBtn = document.getElementById("add-tokens-btn");
 //  ✅  Table-specific game states
 const gameStates = new Map();
 let currentTableId = null;
-    const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=23d44740-e316-4d75-99b0-7fc95050f696");
+    const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=789f846c-a926-40e7-96ad-0dab8ef69079");
 
 const POKERDEX_TREASURY = "Ev3qxX4nZEr3erbMCte6Ji1sBR26SbWYEKUxMm3Mdxxg";
 
