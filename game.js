@@ -430,78 +430,65 @@ let conversionRate = gameSettings.solToToken;
     }
 
  if (addTokensBtn && addTokensInput) {
-    addTokensBtn.addEventListener("click", () => {
-        const playerName = sessionStorage.getItem("playerName");
-        const tokensToAdd = parseInt(addTokensInput.value);
-        const playerSolBalance = parseFloat(sessionStorage.getItem("walletSolBalance")); //  ✅  Get SOL balance
-        if (isNaN(tokensToAdd) || tokensToAdd <= 0) {
-            alert("⚠️ Please enter a valid number of tokens to add.");
-            return;
-        }
-        const solToToken = gameSettings.solToToken; //  ✅  Get the conversion rate
-        const solToAdd = tokensToAdd / solToToken;
+  addTokensBtn.addEventListener("click", async () => {
+    const playerName = sessionStorage.getItem("playerName");
+    const tokensToAdd = parseInt(addTokensInput.value);
+    if (isNaN(tokensToAdd) || tokensToAdd <= 0) {
+        alert("⚠️ Please enter a valid number of tokens to add.");
+        return;
+    }
 
-        //  ✅  Check if player has enough SOL
-        if (playerSolBalance < solToAdd) {
-            alert("❌ Not enough SOL in your mock wallet.");
-            return;
-        }
-        if (!tableId) {
-            console.error("❌ Table ID is not available.");
-            return;
-        }
+    const solToToken = gameSettings.solToToken;
+    const solToAdd = tokensToAdd / solToToken;
+
+    if (!wallet.publicKey || wallet.solBalance < solToAdd) {
+        alert("❌ Not enough SOL in your wallet or Phantom not connected.");
+        return;
+    }
+
+    try {
+        // 1️⃣ Send SOL to treasury FIRST
+        const transaction = new solanaWeb3.Transaction().add(
+            solanaWeb3.SystemProgram.transfer({
+                fromPubkey: wallet.publicKey,
+                toPubkey: new solanaWeb3.PublicKey(POKERDEX_TREASURY),
+                lamports: Math.floor(solToAdd * 1e9),
+            })
+        );
+        const { blockhash } = await connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+        transaction.feePayer = wallet.publicKey;
+
+        const { signature } = await window.solana.signAndSendTransaction(transaction);
+        await connection.confirmTransaction(signature, "confirmed");
+
+        console.log("✅ SOL transfer successful:", signature);
+
+        // 2️⃣ THEN notify backend & update wallet/token balance
         socket.send(JSON.stringify({
             type: "addTokens",
-            playerName: playerName,
-            tableId: tableId,
+            playerName,
+            tableId,
             tokens: tokensToAdd,
-            playerSolBalance: playerSolBalance //  ✅  Send SOL balance
+            solUsed: solToAdd,
         }));
-//  ✅  Update client-side mock wallet
-        try {
-    // Transfer SOL to treasury
-    const transaction = new solanaWeb3.Transaction().add(
-        solanaWeb3.SystemProgram.transfer({
-            fromPubkey: wallet.publicKey,
-            toPubkey: new solanaWeb3.PublicKey(POKERDEX_TREASURY),
-            lamports: solToAdd * 1e9,
-        })
-    );
 
-    const { blockhash } = connection.getLatestBlockhash();
-    transaction.recentBlockhash = blockhash;
-    transaction.feePayer = wallet.publicKey;
+        wallet.solBalance -= solToAdd;
+        wallet.tokenBalance += tokensToAdd;
 
-    const { signature } =  window.solana.signAndSendTransaction(transaction);
-     connection.confirmTransaction(signature, "confirmed");
+        sessionStorage.setItem("walletSolBalance", wallet.solBalance.toString());
+        sessionStorage.setItem("walletTokenBalance", wallet.tokenBalance.toString());
 
-    console.log("✅ SOL sent to treasury. Notifying backend...");
+        updateWalletUI();
+        addTokensInput.value = "";
 
-    socket.send(JSON.stringify({
-        type: "addTokens",
-        playerName,
-        tableId,
-        tokens: tokensToAdd,
-        solUsed: solToAdd
-    }));
-
-    // ✅ Update local wallet + UI
-    wallet.solBalance -= solToAdd;
-    wallet.tokenBalance += tokensToAdd;
-    sessionStorage.setItem("walletSolBalance", wallet.solBalance.toString());
-    sessionStorage.setItem("walletTokenBalance", wallet.tokenBalance.toString());
-    updateWalletUI();
-    addTokensInput.value = "";
-
-} catch (err) {
-    console.error("❌ Token addition failed:", err);
-    alert("❌ Failed to send SOL. Please approve transaction in Phantom.");
-}
-
-    });
-}  else {
-    console.error("❌ Add Tokens input or button not found!");
-}
+        alert(`✅ Successfully added ${tokensToAdd} tokens!`);
+    } catch (err) {
+        console.error("❌ SOL transaction failed:", err);
+        alert("❌ Transaction failed. Please approve in Phantom and try again.");
+    }
+});
+ }
     
     socket.onmessage = function (event) {
         console.log(" 📩  Received message from WebSocket:", event.data);
