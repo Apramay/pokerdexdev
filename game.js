@@ -243,8 +243,11 @@ async function getTokenBalance(mintAddress) {
 
 // Function to update UI display of mock wallet balances
 function updateWalletUI() {
-    document.getElementById("wallet-balance").innerText = ` SOL Balance: ${wallet.solBalance} SOL`;
-    document.getElementById("token-balance").innerText = ` Tokens: ${wallet.tokenBalance}`;
+    const solEl = document.getElementById("wallet-balance");
+    const tokenEl = document.getElementById("token-balance");
+
+    if (solEl) solEl.innerText = `SOL Balance: ${wallet.solBalance} SOL`;
+    if (tokenEl) tokenEl.innerText = `Tokens: ${wallet.tokenBalance}`;
 }
 
 document.addEventListener("DOMContentLoaded", function () {
