@@ -296,19 +296,13 @@ transaction.recentBlockhash = blockhash;
 transaction.feePayer = wallet.publicKey;
 
         // ✅ 2. Send transaction via Phantom
-        const { signature } = await window.solana.signAndSendTransaction(transaction);
-        await connection.confirmTransaction(signature, "confirmed");
-
-        console.log("✅ SOL sent to treasury. Tx Signature:", signature);
-
+      
 
         // Convert SOL to Tokens (100 Tokens per $1)
 const tokenAmount = selectedSol * gameSettings.solToToken;
         
 
         // Deduct SOL from mock wallet & add tokens
-        wallet.solBalance -= selectedSol;
-        wallet.tokenBalance += tokenAmount;
          if (tokenAmount < minBuyIn) {
         alert(`❌ Minimum buy-in is ${minBuyIn} tokens (10x Big Blind)`);
         return;
@@ -317,6 +311,11 @@ const tokenAmount = selectedSol * gameSettings.solToToken;
         alert(`❌ Maximum buy-in is ${maxBuyIn} token (100x Big Blind for Limit games)`);
         return;
     }
+        const { signature } = await window.solana.signAndSendTransaction(transaction);
+await connection.confirmTransaction(signature, "confirmed");
+
+wallet.solBalance -= selectedSol;
+wallet.tokenBalance += tokenAmount;
 
         // ✅ Send player name, tableId, and tokens to WebSocket server
         socket.send(JSON.stringify({ 
