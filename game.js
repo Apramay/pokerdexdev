@@ -261,7 +261,7 @@ function updateWalletUI() {
     if (tokenEl) tokenEl.innerText = `Tokens: ${wallet.tokenBalance}`;
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     await loadWalletConfig();
     const socket = new WebSocket("wss://pokerdexdev-server.onrender.com"); // Replace with your server address
     socket.onopen = () => {
