@@ -146,9 +146,15 @@ function updateUI(tableId) {
         let currentPlayerIndicator = index === gameState.currentPlayerIndex ? " ➡️  " : "";
         let blindIndicator = "";
 
-        if (index === (gameState.dealerIndex + 1) % gameState.players.length && player.tokens > 0) blindIndicator = "SB ";
-
-        if (index === (gameState.dealerIndex + 2) % gameState.players.length && player.tokens > 0) blindIndicator = "BB ";
+        if (gameState.players.length === 2) {
+    // Heads-up: Dealer is SB, other is BB
+    if (index === gameState.dealerIndex && player.tokens > 0) blindIndicator = "SB ";
+    if (index === (gameState.dealerIndex + 1) % 2 && player.tokens > 0) blindIndicator = "BB ";
+} else {
+    // 3+ players
+    if (index === (gameState.dealerIndex + 1) % gameState.players.length && player.tokens > 0) blindIndicator = "SB ";
+    if (index === (gameState.dealerIndex + 2) % gameState.players.length && player.tokens > 0) blindIndicator = "BB ";
+}
             let displayedHand = player.name === gameState.players[gameState.currentPlayerIndex].name
         ? displayHand(player.hand)
             : `<div class="card"><img src="https://apramay.github.io/pokerdexdev/cards/back.jpg" 
