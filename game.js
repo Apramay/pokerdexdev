@@ -112,9 +112,21 @@ const addTokensBtn = document.getElementById("add-tokens-btn");
 //  ✅  Table-specific game states
 const gameStates = new Map();
 let currentTableId = null;
-    const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=e9893869-2145-41d5-8e08-58af10750043");
+    let connection;
+let POKERDEX_TREASURY;
 
-const POKERDEX_TREASURY = "Ev3qxX4nZEr3erbMCte6Ji1sBR26SbWYEKUxMm3Mdxxg";
+async function loadWalletConfig() {
+    try {
+        const res = await fetch("https://pokerdexdev-server.onrender.com/wallet-config");
+        const config = await res.json();
+        connection = new solanaWeb3.Connection(config.rpcUrl);
+        POKERDEX_TREASURY = config.treasury;
+        console.log("✅ Wallet config loaded:", config);
+    } catch (err) {
+        console.error("❌ Failed to load wallet config:", err);
+        alert("❌ Could not connect to Pokerdex config. Please refresh or try later.");
+    }
+}
 
 
 function updateUI(tableId) {
@@ -211,7 +223,6 @@ async function connectPhantomWallet() {
 async function getWalletBalance() {
     if (!wallet.publicKey) return;
 
-    const connection = new solanaWeb3.Connection("https://mainnet.helius-rpc.com/?api-key=e9893869-2145-41d5-8e08-58af10750043");
     const balance = await connection.getBalance(new solanaWeb3.PublicKey(wallet.publicKey));
     wallet.solBalance = balance / solanaWeb3.LAMPORTS_PER_SOL;
     
@@ -251,6 +262,7 @@ function updateWalletUI() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    await loadWalletConfig();
     const socket = new WebSocket("wss://pokerdexdev-server.onrender.com"); // Replace with your server address
     socket.onopen = () => {
         console.log(" ✅  Connected to WebSocket server");
