@@ -215,6 +215,21 @@ async function connectPhantomWallet() {
             console.log("✅ Connected to Phantom Wallet:", wallet.publicKey);
             document.getElementById("wallet-address").textContent = wallet.publicKey;
 
+            let displayName = prompt("Enter a display name to use at the table:");
+            if (!displayName) {
+                displayName = "Player_" + wallet.publicKey.toString().slice(0, 4);
+            }
+
+            // 🆕 Autofill name input & lock it
+            const playerNameInput = document.getElementById("player-name-input");
+            if (playerNameInput) {
+                playerNameInput.value = displayName;
+                playerNameInput.readOnly = true;
+            }
+
+            sessionStorage.setItem("playerName", displayName);
+
+
             // Fetch SOL balance
             await getWalletBalance();
         } catch (err) {
