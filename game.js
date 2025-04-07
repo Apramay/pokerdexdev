@@ -651,7 +651,6 @@ let conversionRate = gameSettings.solToToken;
                 gameState.pot = data.pot;
                 gameState.currentBet = data.currentBet;
                 gameState.round = data.round;
-                gameState.currentPlayerIndex = data.currentPlayerIndex;
                 gameState.dealerIndex = data.dealerIndex;
                 currentTableId = tableId;
                     console.log(`✅ Game state updated for table: ${tableId}`);
