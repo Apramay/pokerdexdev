@@ -773,5 +773,27 @@ let conversionRate = gameSettings.solToToken;
         socket.send(JSON.stringify({ type: "getGameState", tableId }));
     }, 500);
 }
+window.addEventListener("beforeunload", function (e) {
+    const playerName = sessionStorage.getItem("playerName");
+    const tableId = new URLSearchParams(window.location.search).get("table");
+    const gameState = gameStates.get(tableId);
+    if (!playerName || !gameState) return;
+
+    const player = gameState.players.find(p => p.name === playerName);
+    if (!player) return;
+
+    if (player.tokens > 0) {
+        // Block window from closing unless they confirm
+        const message = "⚠️ You are leaving the table. Please click the 'Cashout' button first to retrieve your SOL.";
+        e.preventDefault();
+        e.returnValue = message; // Required for some browsers
+        return message;
+    } else {
+        const message = "Are you sure you want to leave the table?";
+        e.preventDefault();
+        e.returnValue = message;
+        return message;
+    }
+});
 
 });
