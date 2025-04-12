@@ -13,7 +13,7 @@ let gameSettings = { // Initialize gameSettings
     solToToken: 0,
     smallBlind: 0,
     bigBlind: 0,
-        gameType: "" // Initialize gameType
+        gameType: "", // Initialize gameType
         hostType: "" // ✅ NEW
 
 
