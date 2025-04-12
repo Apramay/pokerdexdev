@@ -14,6 +14,8 @@ let gameSettings = { // Initialize gameSettings
     smallBlind: 0,
     bigBlind: 0,
         gameType: "" // Initialize gameType
+        hostType: "" // ✅ NEW
+
 
 };
 
@@ -29,6 +31,8 @@ async function loadGameSettings() {
         gameSettings.smallBlind = settings.smallBlindAmount;
         gameSettings.bigBlind = settings.bigBlindAmount;
                 gameSettings.gameType = settings.gameType; // Assuming 'gameType' is in the server response
+        gameSettings.hostType = settings.hostType;
+
 
 
         console.log('Game settings loaded from server:', gameSettings);
@@ -38,6 +42,8 @@ async function loadGameSettings() {
         document.getElementById("big-blind-display").textContent = gameSettings.bigBlind;
         document.getElementById("sol-to-token-display").textContent = gameSettings.solToToken;
         document.getElementById('game-type').textContent = settings.gameType;
+                document.getElementById('host-type').textContent = settings.hostType;
+
 
         document.getElementById("table-id").textContent = tableId;
 
